@@ -1,0 +1,9 @@
+.img_to_text_main_wrapper{
+    background-color: #ececf563;
+}
+.dashed_wrapper{
+    border: 3px dashed #e0e0ee;
+}
+.dashed_wrapper:hover{
+    background-color: #ececf563;
+}
