@@ -12,6 +12,7 @@ import Signup from "./Pages/Signup";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import NaviBar  from "./Components/NaviBar"
+import Contact from "./Pages/Contact";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -27,7 +28,8 @@ function App() {
 
           <Route element={<NaviBar />}>
             <Route path="/home" element={<Home />} />
-            <Route path="/About" element={<About />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact/>} />
           </Route>
 
 

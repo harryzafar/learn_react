@@ -36,6 +36,11 @@ function NaviBar() {
                     About
                   </NavLink>
                 </li>
+                <li className="nav-item">
+								<NavLink className="nav-link" aria-current="page" to={"/contact"} >
+                    Contact
+                  </NavLink>
+                </li>
               </ul>
               <form className="d-flex">
                 <button className="btn btn-outline-success" type="submit">
