@@ -37,13 +37,13 @@ function NaviBar() {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-								<NavLink className="nav-link" aria-current="page" to={"/contact"} >
-                    Contact
+								<NavLink className="nav-link" aria-current="page" to={"/qr_scanner"} >
+                    QrScanner
                   </NavLink>
                 </li>
                 <li className="nav-item">
-								<NavLink className="nav-link" aria-current="page" to={"/tools"} >
-                    Tools
+								<NavLink className="nav-link" aria-current="page" to={"/img_2_text"} >
+                    Image2Text
                   </NavLink>
                 </li>
               </ul>

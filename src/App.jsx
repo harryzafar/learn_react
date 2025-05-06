@@ -13,7 +13,8 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 import NaviBar  from "./Components/NaviBar"
 import Contact from "./Pages/Contact";
-import Tools from "./Pages/Tools";
+import Img_2_Text from "./Pages/Img_2_Text";
+import Qr_scanner from "./Pages/Image/Qr_scanner";
 
 function App() {
 
@@ -30,7 +31,8 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact/>} />
-            <Route path="/tools" element={<Tools/>} />
+            <Route path="/img_2_text" element={<Img_2_Text/>} />
+            <Route path="/qr_scanner" element={<Qr_scanner/>} />
           </Route>
 
 
