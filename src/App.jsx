@@ -13,9 +13,9 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 import NaviBar  from "./Components/NaviBar"
 import Contact from "./Pages/Contact";
+import Tools from "./Pages/Tools";
 
 function App() {
-  // const [count, setCount] = useState(0)
 
   return (
     <>
@@ -30,6 +30,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact/>} />
+            <Route path="/tools" element={<Tools/>} />
           </Route>
 
 
