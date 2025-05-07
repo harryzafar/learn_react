@@ -4,6 +4,14 @@
 .dashed_wrapper{
     border: 3px dashed #e0e0ee;
 }
+.dashed_wrapper.dragover{
+    background-color: #e9ecef;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
 .dashed_wrapper:hover{
     background-color: #ececf563;
+}
+.dashed_wrapper input[type="file"]#imageInput{
+    display: none;
 }
