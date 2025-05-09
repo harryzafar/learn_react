@@ -1,8 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
 function ImageToText() {
-  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
-console.log(apiKey);
 
   const ImageInputRef = useRef(null);
   const [imageName, setImageName] = useState(null);
@@ -113,6 +111,8 @@ console.log(apiKey);
     setIsConverted(false);
     handleCancel();
   }
+
+    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
 
 
 
