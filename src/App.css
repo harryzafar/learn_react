@@ -12,6 +12,7 @@
 .dashed_wrapper:hover{
     background-color: #ececf563;
 }
-.dashed_wrapper input[type="file"]#imageInput{
-    display: none;
+
+.content_actions p span{
+    cursor: pointer;
 }
