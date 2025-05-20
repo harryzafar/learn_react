@@ -106,29 +106,46 @@ function ImageToText() {
     setIsExpanded((prev) => !prev);
   };
 
-  const apiLogin = async () => {
+  const prepareConvertButton = async () => {
+    ConvertButton.current.setAttribute("disabled", "true");
+    ConvertButton.current.innerText('Converting...');
     setIsLoading(true);
+    const email = "husain.zafar13@gmail.com";
+    const password = "12345678"; 
+    const LoginResponse = await apiLogin(email, password);
+    const LoginData = await LoginResponse.json();
+    console.log(LoginData);
+    if (LoginData.status === "success") {
+      localStorage.setItem("access_token", LoginData.access_token);
+      localStorage.setItem("refresh_token", LoginData.refresh_token);
+      handleConvert();
+    } else {
+      console.log("Login failed");
+    }
+    setIsLoading(false);
+    ConvertButton.current.innerText('Convert');
+    ConvertButton.current.removeAttribute("disabled");
+
+    //  ConvertButton.current.setAttribute("disabled", "false");
+
+
+  }
+
+  const apiLogin = async (email, password) => {
     const response = await fetch("https://saaol.org/tools/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: "husain.zafar13@gmail.com",
-        password: "12345678",
+        email: email,
+        password: password,
       }),
     });
-    const data = await response.json();
-    console.log(data);
-    if (data.status === "success") {
-      localStorage.setItem("access_token", data.access_token);
-      setIsLoading(false);
-    } else {
-      console.log("Login failed");
-    }
+
+
   };
   const apiLogout = async () => {
-    setIsLoading(true);
     const token = localStorage.getItem("access_token");
     const response = await fetch("https://saaol.org/tools/api/logout", {
       method: "post",
@@ -155,18 +172,22 @@ function ImageToText() {
       .post("https://saaol.org/tools/api/auth/login", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
         },
       })
       .then((response) => {
         setExtractedText(response.data.text);
-        setIsConverted(true);
-        setIsLoading(false);
+        // setIsConverted(true);
+        // setIsLoading(false);
+        apiLogout();
       })
       .catch((error) => {
+        apiLogout();
         console.error("Error converting image to text:", error);
         setIsLoading(false);
       });
   };
+
   const handleStartOver = () => {
     setIsConverted(false);
     handleCancel();
@@ -182,9 +203,7 @@ function ImageToText() {
           <p>
             Convert images to text using OCR (Optical Character Recognition).
           </p>
-          {/* <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner> */}
+          
         </div>
 
         <div className="row mt-4 bg-white rounded-3 p-4 ">
@@ -192,9 +211,8 @@ function ImageToText() {
             <>
               <div className="col-md-12 text-center">
                 <div
-                  className={`p-4 rounded-3 dashed_wrapper ${
-                    isDragging ? "dragover" : ""
-                  } `}
+                  className={`p-4 rounded-3 dashed_wrapper ${isDragging ? "dragover" : ""
+                    } `}
                   onClick={handleBrowseClick}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -244,7 +262,7 @@ function ImageToText() {
                     />
                   </div>
                   <div className="img_action mt-4 d-flex justify-content-between align-items-center w-100">
-                    <div>
+                    <div className="d-flex align-items-center">
                       <button
                         className="btn btn-secondary"
                         onClick={handleCancel}
@@ -256,7 +274,7 @@ function ImageToText() {
                       <button
                         className="btn btn-dark"
                         ref={ConvertButton}
-                        onClick={apiLogin}
+                        onClick={prepareConvertButton}
                       >
                         Convert
                       </button>
@@ -315,37 +333,10 @@ function ImageToText() {
                               overflowY: isExpanded ? "visible" : "auto",
                             }}
                           >
-                            Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit. Facilis minus temporibus quod veritatis,
-                            cupiditate voluptate magnam repudiandae tempora
-                            provident cum illo delectus velit at, explicabo quas
-                            repellat atque sed consectetur quia, dolor eos
-                            excepturi voluptates quaerat iste. Molestias sed rem
-                            quisquam excepturi accusamus error, vero deserunt
-                            repellendus unde commodi id et eos alias quia optio
-                            iure quas. Ducimus tempore accusantium inventore
-                            aliquam impedit ratione ullam eos debitis harum
-                            blanditiis. Provident, quod amet. Rem praesentium
-                            ratione animi culpa qui cumque, consectetur nam
-                            minima ullam sapiente sit quaerat libero tempore
-                            nesciunt iure! Dolorum sit enim quas accusantium
-                            repudiandae nostrum, quidem nobis consequatur
-                            provident quibusdam reprehenderit totam itaque dolor
-                            deleniti ullam sapiente maxime. Sed impedit natus
-                            vitae similique laborum quaerat perferendis id
-                            facilis itaque eaque provident, nisi labore eius
-                            expedita explicabo! Doloremque fugiat qui cumque
-                            debitis. Nobis quam modi aliquid enim, totam, non
-                            suscipit temporibus at nostrum laborum quos dicta
-                            deleniti tenetur possimus a asperiores odit
-                            doloremque! Omnis non quae magni ut debitis
-                            molestias blanditiis, itaque, at aperiam
-                            perspiciatis asperiores aut necessitatibus officia
-                            nam? Maiores nostrum inventore nisi reprehenderit
-                            nam! Sed debitis ullam ratione illo aspernatur iure
-                            quisquam, saepe corporis! Voluptatum deleniti est
-                            ullam. Quis dolorem id cumque dicta, odit excepturi
-                            iste fugit?
+                            {extractedText ? (
+                             <p>{extractedText}</p>
+                            ) : ( "")
+                            }
                           </div>
                         </div>
                         <div className="col-md-1">
