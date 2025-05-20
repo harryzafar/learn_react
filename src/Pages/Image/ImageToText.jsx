@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Spinner from "react-bootstrap/Spinner";
+import axios from "axios";
 
 function ImageToText() {
   const ImageInputRef = useRef(null);
@@ -125,7 +126,6 @@ function ImageToText() {
         setIsConverted(true);
       })
       .catch((error) => {
-        apiLogout();
         console.error("Error converting image to text:", error);
         setExtractedText("Error converting image to text");
         setIsConverted(true);
