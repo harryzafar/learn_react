@@ -10,7 +10,8 @@ function ImageToText() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isConverted, setIsConverted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isStartConverting, setIsStartConverting] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [extractedText, setExtractedText] = useState(null);
   const ConvertButton = useRef(null);
 
@@ -106,90 +107,34 @@ function ImageToText() {
     setIsExpanded((prev) => !prev);
   };
 
-  const prepareConvertButton = async () => {
-    ConvertButton.current.setAttribute("disabled", "true");
-    ConvertButton.current.innerText('Converting...');
-    setIsLoading(true);
-    const email = "husain.zafar13@gmail.com";
-    const password = "12345678"; 
-    const LoginResponse = await apiLogin(email, password);
-    const LoginData = await LoginResponse.json();
-    console.log(LoginData);
-    if (LoginData.status === "success") {
-      localStorage.setItem("access_token", LoginData.access_token);
-      localStorage.setItem("refresh_token", LoginData.refresh_token);
-      handleConvert();
-    } else {
-      console.log("Login failed");
-    }
-    setIsLoading(false);
-    ConvertButton.current.innerText('Convert');
-    ConvertButton.current.removeAttribute("disabled");
-
-    //  ConvertButton.current.setAttribute("disabled", "false");
-
-
-  }
-
-  const apiLogin = async (email, password) => {
-    const response = await fetch("https://saaol.org/tools/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    });
-
-
-  };
-  const apiLogout = async () => {
-    const token = localStorage.getItem("access_token");
-    const response = await fetch("https://saaol.org/tools/api/logout", {
-      method: "post",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-    if (data.status === "success") {
-      localStorage.removeItem("accessToken");
-      setIsLoading(false);
-    } else {
-      console.log("Logout failed");
-    }
-  };
-
   const handleConvert = () => {
-    setIsLoading(true);
+    // setIsLoading(true);
+    setIsStartConverting(true);
     // Call the OCR API here
     const formData = new FormData();
     formData.append("image", imagePreview);
     axios
-      .post("https://saaol.org/tools/api/auth/login", formData, {
+      .post("https://saaol.org/tools/api/v2/ocr/image_to_text", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+          "x-api-key": apiKey,
         },
       })
       .then((response) => {
         setExtractedText(response.data.text);
-        // setIsConverted(true);
-        // setIsLoading(false);
-        apiLogout();
+        setIsConverted(true);
       })
       .catch((error) => {
         apiLogout();
         console.error("Error converting image to text:", error);
-        setIsLoading(false);
+        setExtractedText("Error converting image to text");
+        setIsConverted(true);
       });
   };
 
   const handleStartOver = () => {
     setIsConverted(false);
+    setIsStartConverting(false);
     handleCancel();
   };
 
@@ -203,7 +148,6 @@ function ImageToText() {
           <p>
             Convert images to text using OCR (Optical Character Recognition).
           </p>
-          
         </div>
 
         <div className="row mt-4 bg-white rounded-3 p-4 ">
@@ -249,7 +193,7 @@ function ImageToText() {
               </div>
             </>
           )}
-          {isUploaded && !isConverted && (
+          {isUploaded && !isStartConverting && (
             <>
               <div className="col-md-12 text-center">
                 <div className="d-flex flex-column justify-content-center align-items-center p-4 rounded-3 dashed_wrapper">
@@ -274,15 +218,11 @@ function ImageToText() {
                       <button
                         className="btn btn-dark"
                         ref={ConvertButton}
-                        onClick={prepareConvertButton}
+                        onClick={handleConvert}
                       >
                         Convert
                       </button>
-                      {isLoading && (
-                        <Spinner animation="border" role="status">
-                          <span className="visually-hidden">Loading...</span>
-                        </Spinner>
-                      )}
+                      
                     </div>
                   </div>
                 </div>
@@ -290,7 +230,7 @@ function ImageToText() {
             </>
           )}
 
-          {isConverted ? (
+          {isStartConverting ? (
             <>
               <div className="col-md-12">
                 <div className="d-flex justify-content-end py-2">
@@ -323,47 +263,56 @@ function ImageToText() {
                       </div>
                     </div>
                     <div className="col-md-10">
-                      <div className="row">
-                        <div className="col-md-11">
-                          <div
-                            id="extracted_content"
-                            className=""
-                            style={{
-                              maxHeight: isExpanded ? "none" : "250px",
-                              overflowY: isExpanded ? "visible" : "auto",
-                            }}
-                          >
-                            {extractedText ? (
-                             <p>{extractedText}</p>
-                            ) : ( "")
-                            }
+                      {isConverted ? (
+                        <div className="row">
+                          <div className="col-md-11">
+                            <div
+                              id="extracted_content"
+                              className=""
+                              style={{
+                                maxHeight: isExpanded ? "none" : "450px",
+                                overflowY: isExpanded ? "visible" : "auto",
+                              }}
+                            >
+                              {extractedText}
+                            </div>
+                          </div>
+                          <div className="col-md-1">
+                            <div className="content_actions d-flex flex-column align-items-end">
+                              <p
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title={isCopy}
+                                onClick={handleCopy}
+                              >
+                                <span className="material-symbols-outlined">
+                                  content_copy
+                                </span>
+                              </p>
+                              <p
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title={isExpanded ? "Shrink" : "Expand"}
+                                onClick={handleToggleExpand}
+                              >
+                                <span className="material-symbols-outlined">
+                                  {isExpanded ? "hide" : "pan_zoom"}
+                                </span>
+                              </p>
+                            </div>
                           </div>
                         </div>
-                        <div className="col-md-1">
-                          <div className="content_actions d-flex flex-column align-items-end">
-                            <p
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              title={isCopy}
-                              onClick={handleCopy}
-                            >
-                              <span className="material-symbols-outlined">
-                                content_copy
-                              </span>
-                            </p>
-                            <p
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              title={isExpanded ? "Shrink" : "Expand"}
-                              onClick={handleToggleExpand}
-                            >
-                              <span className="material-symbols-outlined">
-                                {isExpanded ? "hide" : "pan_zoom"}
-                              </span>
-                            </p>
-                          </div>
+                      ) : (
+                        <div className="w-100 h-100 d-flex justify-content-center align-items-center">
+                        <Spinner
+                          animation="border"
+                          role="status"
+                          style={{ width: "2rem", height: "2rem" }}
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </Spinner>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
