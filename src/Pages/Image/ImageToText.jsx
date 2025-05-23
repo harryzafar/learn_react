@@ -5,6 +5,7 @@ import axios from "axios";
 function ImageToText() {
   const ImageInputRef = useRef(null);
   const [imageName, setImageName] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isCopy, setIsCopy] = useState("Copy");
@@ -12,9 +13,11 @@ function ImageToText() {
   const [isUploaded, setIsUploaded] = useState(false);
   const [isConverted, setIsConverted] = useState(false);
   const [isStartConverting, setIsStartConverting] = useState(false);
-  // const [isLoading, setIsLoading] = useState(false);
   const [extractedText, setExtractedText] = useState(null);
   const ConvertButton = useRef(null);
+
+  const apiKey = import.meta.env.VITE_OCR_API_KEY;
+  const apiEndpoint = import.meta.env.VITE_OCR_API_URL;
 
   useEffect(() => {
     // Select all tooltip-enabled elements
@@ -60,6 +63,7 @@ function ImageToText() {
   const handlefile = (file) => {
     setImageName(file.name);
     setImagePreview(URL.createObjectURL(file));
+    setImageFile(file); 
     setIsUploaded(true);
   };
 
@@ -108,27 +112,47 @@ function ImageToText() {
     setIsExpanded((prev) => !prev);
   };
 
-  const handleConvert = () => {
-    // setIsLoading(true);
-    setIsStartConverting(true);
-    // Call the OCR API here
+  const image2textApi = async (imageFile) => {
     const formData = new FormData();
-    formData.append("image", imagePreview);
-    axios
-      .post("https://saaol.org/tools/api/v2/ocr/image_to_text", formData, {
+    formData.append("image", imageFile);
+    try {
+      const response = await axios.post(apiEndpoint, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "multipart/form-data", 
           "x-api-key": apiKey,
         },
       })
-      .then((response) => {
-        setExtractedText(response.data.text);
-        setIsConverted(true);
+      return response.data
+      
+      
+    } catch (error) {
+      // console.error("Error converting image to text:", error);
+      return JSON.stringify({
+        status: "error",
+        message: "Error converting image to text",
+      });
+     
+    }
+  };
+
+  const handleConvert = () => {
+
+    setIsStartConverting(true);
+    // Call the OCR API here
+    image2textApi(imageFile)
+      .then((data) => {
+        if (data.status === "success") {
+          setExtractedText(data.text);
+          setIsConverted(true);
+        } else {
+          setExtractedText(data.message);
+          setIsConverted(false);
+        }
       })
       .catch((error) => {
-        console.error("Error converting image to text:", error);
+        console.error("Error:", error);
         setExtractedText("Error converting image to text");
-        setIsConverted(true);
+        setIsConverted(false);
       });
   };
 
@@ -138,7 +162,7 @@ function ImageToText() {
     handleCancel();
   };
 
-  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+  
 
   return (
     <div className="container-fluid img_to_text_main_wrapper">
@@ -270,7 +294,7 @@ function ImageToText() {
                               id="extracted_content"
                               className=""
                               style={{
-                                maxHeight: isExpanded ? "none" : "450px",
+                                maxHeight: isExpanded ? "none" : "250px",
                                 overflowY: isExpanded ? "visible" : "auto",
                               }}
                             >
