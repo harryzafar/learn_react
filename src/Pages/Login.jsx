@@ -1,13 +1,27 @@
+import { useState } from "react";
 import { Link } from "react-router";
 
 function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (e)=>{
+        e.preventDefault();
+        if(!email || !password){
+            console.log('not ready to submit')
+            return ;
+        }
+        console.log('submitting with',{username, password});
+
+
+    }
     return (
         <div className="container">
             <div className="row">
                 <div className="col-md-6">
                     <div className="login_wrapper">
                         <h2 className="text-center">Login</h2>
-                        <form action="/home">
+                        <form  onSubmit={handleSubmit} >
                             <div className="form-group mt-2">
                                 <label htmlFor="email" className="form-label">
                                     Email
